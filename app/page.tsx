@@ -5,14 +5,13 @@ import Head from "next/head";
 
 export default function Home() {
   const [volume, setVolume] = useState(1);
-  const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   interface SearchResult {
     volume: number;
     index: number;
     content: string;
     url: string;
-    majlisiGrading: string;
+    majlisiGrading: string | undefined;
   }
 
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -32,7 +31,6 @@ export default function Home() {
         }
         return response.json();
       })
-      .then((data) => setData(data))
       .catch((error) => console.error("Fetch error:", error));
   }, [volume]);
 
@@ -81,22 +79,22 @@ export default function Home() {
     }
 
     setSearchPerformed(true);
-    const searchResults: ((prevState: never[]) => never[]) | { volume: number; index: any; content: any; url: any; majlisiGrading: any; }[] = [];
+    const searchResults: SearchResult[] = [];
     const volumesToSearch = searchAllVolumes ? [1, 2, 3, 4, 5, 6, 7, 8] : [volume];
 
     volumesToSearch.forEach((vol) => {
       fetch(`/jsons/kafi/kafi_v${vol}.json`)
         .then((response) => response.json())
-        .then((volumeData) => {
-          volumeData.forEach((item: { englishText: any; majlisiGrading: any; URL: any; }, idx: any) => {
+        .then((volumeData: { englishText: string; majlisiGrading?: string; URL: string; }[]) => {
+          volumeData.forEach((item, idx) => {
             const content = item.englishText; // Using englishText for the search term
             const majlisiGrading = item.majlisiGrading; // Grading may be undefined
             const url = item.URL;
 
             // Updated grading checks using Sets
-            const isSahih = sahihOnly && validGradingsSet.has(majlisiGrading);
-            const isGood = goodOnly && goodGradingsSet.has(majlisiGrading);
-            const isWeak = weakOnly && weakGradingsSet.has(majlisiGrading);
+            const isSahih = sahihOnly && majlisiGrading && validGradingsSet.has(majlisiGrading);
+            const isGood = goodOnly && majlisiGrading && goodGradingsSet.has(majlisiGrading);
+            const isWeak = weakOnly && majlisiGrading && weakGradingsSet.has(majlisiGrading);
             const isUnknown =
               unknownOnly &&
               (majlisiGrading === "مرسل" || majlisiGrading === "مجهول");
@@ -161,9 +159,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen p-8 pb-20 sm:p-20 bg-gray-100 text-gray-900">
-      <Head>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" />
-      </Head>
       <h1 className="text-4xl font-bold text-center -mt-10 mb-4">
         Kafi Explorer
       </h1>
