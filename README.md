@@ -21,8 +21,11 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Credit
+
 - My brother Ali for 'putting me on' to react and github copilot
 
-- Mr Peace for not catching me make this in class instead of revising
-  
-- [MohammedArab1](https://github.com/MohammedArab1) with his [ThaqalaynAPI](https://github.com/MohammedArab1/ThaqalaynAPI) for his public jsons of al-kafi volumes 1-8 with gradings and thaqalayn links which saved me time scraping text, links and gradings my self, instead i could just sanitise his data to suit my needs.
+- Mr Peace for not catching me make this in his class instead of revising
+
+- Claude 3.5 Sonnet THE GOAT (openai sucks)
+
+- [MohammedArab1](https://github.com/MohammedArab1) with his [ThaqalaynAPI](https://github.com/MohammedArab1/ThaqalaynAPI) for his jsons of al-kafi volumes 1-8 with gradings and thaqalayn links which saved me time scraping text, links and gradings myself, instead i just sanitised his data to suit my needs.

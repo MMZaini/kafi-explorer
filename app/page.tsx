@@ -7,6 +7,8 @@ export default function Home() {
   const [volume, setVolume] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [flexibleSearch, setFlexibleSearch] = useState(false);
+
   interface SearchResult {
     volume: number;
     index: number;
@@ -123,7 +125,13 @@ export default function Home() {
               (majlisiGrading || unknownOnly) &&
               isGradingValid
             ) {
-              const isContentMatch = normalizedContent.includes(normalizedSearchTerm);
+              const isContentMatch = flexibleSearch
+                ? searchTerm
+                  .trim()
+                  .toLowerCase()
+                  .split(/\s+/)
+                  .every(word => normalizedContent.includes(word))
+                : normalizedContent.includes(normalizedSearchTerm);
 
               if (isContentMatch) {
                 results.push({
@@ -155,7 +163,22 @@ export default function Home() {
 
   const highlightSearchTerm = (text: string, term: string) => {
     if (!term || isArabic(term)) return text;
-    const regex = new RegExp(`(${term})`, "gi");
+
+    if (flexibleSearch) {
+      const words = term.trim().split(/\s+/);
+      const regex = new RegExp(`(${words.join('|')})`, 'gi');
+      return text.split(regex).map((part, index) =>
+        words.some(word => part.toLowerCase() === word.toLowerCase()) ? (
+          <span key={index} className="bg-yellow-200 font-bold">
+            {part}
+          </span>
+        ) : (
+          part
+        )
+      );
+    }
+
+    const regex = new RegExp(`(${term})`, 'gi');
     return text.split(regex).map((part, index) =>
       part.toLowerCase() === term.toLowerCase() ? (
         <span key={index} className="bg-yellow-200 font-bold">
@@ -179,7 +202,7 @@ export default function Home() {
       </div>
 
       {/* Search Controls */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-14">
         <div className="bg-white rounded-xl shadow-md p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Volume Selection */}
@@ -202,17 +225,32 @@ export default function Home() {
                 <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-5 h-5" />
               </div>
 
-              <div className="flex items-center space-x-2">
-                <input
-                  id="searchAllVolumes"
-                  type="checkbox"
-                  checked={searchAllVolumes}
-                  onChange={(e) => setSearchAllVolumes(e.target.checked)}
-                  className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <label htmlFor="searchAllVolumes" className="text-sm text-gray-600">
-                  Search Across All Volumes
-                </label>
+              <div className="flex flex-col space-y-2">
+                <div className="flex items-center space-x-2">
+                  <input
+                    id="searchAllVolumes"
+                    type="checkbox"
+                    checked={searchAllVolumes}
+                    onChange={(e) => setSearchAllVolumes(e.target.checked)}
+                    className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <label htmlFor="searchAllVolumes" className="text-sm text-gray-600">
+                    Search Across All Volumes
+                  </label>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <input
+                    id="flexibleSearch"
+                    type="checkbox"
+                    checked={flexibleSearch}
+                    onChange={(e) => setFlexibleSearch(e.target.checked)}
+                    className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <label htmlFor="flexibleSearch" className="text-sm text-gray-600">
+                    Flexible Word Search
+                  </label>
+                </div>
               </div>
             </div>
 
