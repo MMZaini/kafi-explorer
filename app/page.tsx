@@ -182,6 +182,19 @@ export default function Home() {
               </option>
             ))}
           </select>
+
+          <div className="flex items-center mt-4">
+            <input
+              id="searchAllVolumes"
+              type="checkbox"
+              checked={searchAllVolumes}
+              onChange={(e) => setSearchAllVolumes(e.target.checked)}
+              className="mr-2"
+            />
+            <label htmlFor="searchAllVolumes" className="text-sm text-gray-700">
+              Search All Volumes
+            </label>
+          </div>
         </div>
 
         <div className="w-full sm:w-auto ml-auto">
@@ -202,18 +215,6 @@ export default function Home() {
             className="p-2 border rounded bg-white text-gray-900 w-full"
           />
           <div className="grid grid-cols-2 gap-x-8 gap-2 mt-4">
-            <div className="flex items-center">
-              <input
-                id="searchAllVolumes"
-                type="checkbox"
-                checked={searchAllVolumes}
-                onChange={(e) => setSearchAllVolumes(e.target.checked)}
-                className="mr-2"
-              />
-              <label htmlFor="searchAllVolumes" className="text-sm text-gray-700">
-                Search All Volumes
-              </label>
-            </div>
             <div className="flex items-center">
               <input
                 id="sahihOnly"
