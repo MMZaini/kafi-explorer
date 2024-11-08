@@ -7,7 +7,15 @@ export default function Home() {
   const [volume, setVolume] = useState(1);
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
+  interface SearchResult {
+    volume: number;
+    index: number;
+    content: string;
+    url: string;
+    majlisiGrading: string;
+  }
+
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [exactMatch, setExactMatch] = useState(false);
   const [searchAllVolumes, setSearchAllVolumes] = useState(false);
   const [searchPerformed, setSearchPerformed] = useState(false);
@@ -73,14 +81,14 @@ export default function Home() {
     }
 
     setSearchPerformed(true);
-    const searchResults = [];
+    const searchResults: ((prevState: never[]) => never[]) | { volume: number; index: any; content: any; url: any; majlisiGrading: any; }[] = [];
     const volumesToSearch = searchAllVolumes ? [1, 2, 3, 4, 5, 6, 7, 8] : [volume];
 
     volumesToSearch.forEach((vol) => {
       fetch(`/jsons/kafi/kafi_v${vol}.json`)
         .then((response) => response.json())
         .then((volumeData) => {
-          volumeData.forEach((item, idx) => {
+          volumeData.forEach((item: { englishText: any; majlisiGrading: any; URL: any; }, idx: any) => {
             const content = item.englishText; // Using englishText for the search term
             const majlisiGrading = item.majlisiGrading; // Grading may be undefined
             const url = item.URL;
