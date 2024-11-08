@@ -331,7 +331,7 @@ export default function Home() {
                   </div>
 
                   <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                    <pre className="text-gray-800 text-lg whitespace-pre-wrap">
+                    <pre className="text-gray-800 md:text-lg text-base whitespace-pre-wrap ">
                       {isArabic(searchTerm)
                         ? result.content
                         : highlightSearchTerm(result.content, searchTerm)}
