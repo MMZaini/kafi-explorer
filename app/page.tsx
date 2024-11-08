@@ -14,7 +14,6 @@ export default function Home() {
   }
 
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [exactMatch, setExactMatch] = useState(false);
   const [searchAllVolumes, setSearchAllVolumes] = useState(false);
   const [searchPerformed, setSearchPerformed] = useState(false);
   const [sahihOnly, setSahihOnly] = useState(false);
@@ -71,6 +70,12 @@ export default function Home() {
   const goodGradingsSet = new Set(goodGradings);
   const weakGradingsSet = new Set(weakGradings);
 
+  // Utility function to detect Arabic characters
+  const isArabic = (text: string) => /[\u0600-\u06FF]/.test(text);
+
+  // Utility function to remove harakat (diacritics)
+  const removeHarakat = (text: string) => text.replace(/[\u064B-\u0652]/g, "");
+
   const handleSearch = () => {
     if (searchTerm.trim() === "") {
       setSearchResults([]);
@@ -81,17 +86,20 @@ export default function Home() {
     setSearchPerformed(true);
     const searchResults: SearchResult[] = [];
     const volumesToSearch = searchAllVolumes ? [1, 2, 3, 4, 5, 6, 7, 8] : [volume];
+    const searchInArabic = isArabic(searchTerm);
+    const normalizedSearchTerm = searchInArabic ? removeHarakat(searchTerm.trim()) : searchTerm.trim().toLowerCase();
 
     volumesToSearch.forEach((vol) => {
       fetch(`/jsons/kafi/kafi_v${vol}.json`)
         .then((response) => response.json())
-        .then((volumeData: { englishText: string; majlisiGrading?: string; URL: string; }[]) => {
+        .then((volumeData: { englishText: string; arabicText?: string; majlisiGrading?: string; URL: string; }[]) => {
           volumeData.forEach((item, idx) => {
-            const content = item.englishText; // Using englishText for the search term
-            const majlisiGrading = item.majlisiGrading; // Grading may be undefined
+            const contentToSearch = searchInArabic ? item.arabicText || "" : item.englishText;
+            const normalizedContent = searchInArabic ? removeHarakat(contentToSearch.trim()) : contentToSearch.trim().toLowerCase();
+            const majlisiGrading = item.majlisiGrading;
             const url = item.URL;
 
-            // Updated grading checks using Sets
+            // Grading checks
             const isSahih = sahihOnly && majlisiGrading && validGradingsSet.has(majlisiGrading);
             const isGood = goodOnly && majlisiGrading && goodGradingsSet.has(majlisiGrading);
             const isWeak = weakOnly && majlisiGrading && weakGradingsSet.has(majlisiGrading);
@@ -99,37 +107,32 @@ export default function Home() {
               unknownOnly &&
               (majlisiGrading === "مرسل" || majlisiGrading === "مجهول");
 
-            // Allow for multiple filters to be active at once
             const isGradingValid =
               (sahihOnly && isSahih) ||
               (goodOnly && isGood) ||
               (weakOnly && isWeak) ||
               (unknownOnly && isUnknown) ||
-              (!sahihOnly && !goodOnly && !weakOnly && !unknownOnly); // No filter applied
+              (!sahihOnly && !goodOnly && !weakOnly && !unknownOnly);
 
-            // Check if the item has a valid grading if filtering by grading
             if (
-              (majlisiGrading || unknownOnly) && // Either there's a grading or we are searching with the "Unknown Only" filter
+              (majlisiGrading || unknownOnly) &&
               isGradingValid
             ) {
-              // Check if content matches the search term (exact match or partial match)
-              const isContentMatch = exactMatch
-                ? content === searchTerm
-                : content.includes(searchTerm);
+              const isContentMatch = normalizedContent.includes(normalizedSearchTerm);
 
               if (isContentMatch) {
                 searchResults.push({
                   volume: vol,
                   index: idx,
-                  content,
+                  content: item.englishText, // Always display English text
                   url,
-                  majlisiGrading: item.majlisiGrading, // Ensure grading is included
+                  majlisiGrading: item.majlisiGrading,
                 });
               }
             }
           });
 
-          console.log("Search Results:", searchResults); // Log the results
+          console.log("Search Results:", searchResults);
           setSearchResults(searchResults);
         })
         .catch((error) => console.error("Error fetching data:", error));
@@ -144,7 +147,7 @@ export default function Home() {
   };
 
   const highlightSearchTerm = (text: string, term: string) => {
-    if (!term) return text;
+    if (!term || isArabic(term)) return text;
     const regex = new RegExp(`(${term})`, "gi");
     return text.split(regex).map((part, index) =>
       part.toLowerCase() === term.toLowerCase() ? (
@@ -198,19 +201,7 @@ export default function Home() {
             onBlur={handleSearchBlur}
             className="p-2 border rounded bg-white text-gray-900 w-full"
           />
-          <div className="grid grid-cols-2 gap-2 mt-4">
-            <div className="flex items-center">
-              <input
-                id="exactMatch"
-                type="checkbox"
-                checked={exactMatch}
-                onChange={(e) => setExactMatch(e.target.checked)}
-                className="mr-2"
-              />
-              <label htmlFor="exactMatch" className="text-sm text-gray-700">
-                Exact Match
-              </label>
-            </div>
+          <div className="grid grid-cols-2 gap-x-8 gap-2 mt-4">
             <div className="flex items-center">
               <input
                 id="searchAllVolumes"
@@ -293,13 +284,15 @@ export default function Home() {
                     Volume {result.volume}, Page {result.index + 1}
                   </h3>
                   <pre className="bg-gray-200 p-2 rounded text-gray-800 text-lg whitespace-pre-wrap">
-                    {highlightSearchTerm(result.content, searchTerm)}
+                    {isArabic(searchTerm)
+                      ? result.content
+                      : highlightSearchTerm(result.content, searchTerm)}
                   </pre>
                   <a href={result.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
                     Link
                   </a>
                   <p className="text-lg">
-                    Grading: {result.majlisiGrading} {/* Displaying the grading */}
+                    Grading: {result.majlisiGrading}
                   </p>
                 </div>
               ))
