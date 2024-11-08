@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Search, Book, ChevronDown } from "lucide-react";
 
 export default function Home() {
   const [volume, setVolume] = useState(1);
@@ -167,148 +168,157 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen p-8 pb-20 sm:p-20 bg-gray-100 text-gray-900">
-      <h1 className="text-4xl font-bold text-center -mt-10 mb-4">
-        Kafi Explorer
-      </h1>
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-12 max-w-md mx-auto">
-        <div className="w-full sm:w-auto mb-4 sm:mb-0">
-          <label htmlFor="volume" className="block mb-2 text-sm font-medium text-gray-700">
-            Select Volume:
-          </label>
-          <select
-            id="volume"
-            value={volume}
-            onChange={handleVolumeChange}
-            className="p-2 border rounded bg-white text-gray-900 w-full"
-          >
-            {[...Array(8).keys()].map((v) => (
-              <option key={v + 1} value={v + 1}>
-                Volume {v + 1}
-              </option>
-            ))}
-          </select>
-
-          <div className="flex items-center mt-4">
-            <input
-              id="searchAllVolumes"
-              type="checkbox"
-              checked={searchAllVolumes}
-              onChange={(e) => setSearchAllVolumes(e.target.checked)}
-              className="mr-2"
-            />
-            <label htmlFor="searchAllVolumes" className="text-sm text-gray-700">
-              Search All Volumes
-            </label>
-          </div>
-        </div>
-
-        <div className="w-full sm:w-auto ml-auto">
-          <label htmlFor="search" className="block mb-2 text-sm font-medium text-gray-700">
-            Search:
-          </label>
-          <input
-            id="search"
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                handleSearch();
-              }
-            }}
-            onBlur={handleSearchBlur}
-            className="p-2 border rounded bg-white text-gray-900 w-full"
-          />
-          <div className="grid grid-cols-2 gap-x-8 gap-2 mt-4">
-            <div className="flex items-center">
-              <input
-                id="sahihOnly"
-                type="checkbox"
-                checked={sahihOnly}
-                onChange={(e) => setSahihOnly(e.target.checked)}
-                className="mr-2"
-              />
-              <label htmlFor="sahihOnly" className="text-sm text-gray-700">
-                Sahih
-              </label>
-            </div>
-            <div className="flex items-center">
-              <input
-                id="goodOnly"
-                type="checkbox"
-                checked={goodOnly}
-                onChange={(e) => setGoodOnly(e.target.checked)}
-                className="mr-2"
-              />
-              <label htmlFor="goodOnly" className="text-sm text-gray-700">
-                Good
-              </label>
-            </div>
-            <div className="flex items-center">
-              <input
-                id="weakOnly"
-                type="checkbox"
-                checked={weakOnly}
-                onChange={(e) => setWeakOnly(e.target.checked)}
-                className="mr-2"
-              />
-              <label htmlFor="weakOnly" className="text-sm text-gray-700">
-                Weak
-              </label>
-            </div>
-            <div className="flex items-center">
-              <input
-                id="unknownOnly"
-                type="checkbox"
-                checked={unknownOnly}
-                onChange={(e) => setUnknownOnly(e.target.checked)}
-                className="mr-2"
-              />
-              <label htmlFor="unknownOnly" className="text-sm text-gray-700">
-                Unknown
-              </label>
-            </div>
-          </div>
-          <button
-            onClick={handleSearch}
-            className="mt-4 p-2 bg-blue-500 text-white rounded shadow-lg hover:bg-blue-600 transition"
-          >
-            Search
-          </button>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* Header Section */}
+      <div className="bg-white shadow-lg">
+        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+          <h1 className="text-4xl font-bold text-center text-gray-900 -mb-2 -mt-2">
+            Kafi Explorer
+          </h1>
         </div>
       </div>
 
-      {searchPerformed && (
-        <div className="mb-12">
-          <div className="border p-4 rounded mb-4 bg-white shadow max-w-7xl mx-auto">
+      {/* Search Controls */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Volume Selection */}
+            <div className="space-y-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Volume Selection
+              </label>
+              <div className="relative">
+                <select
+                  value={volume}
+                  onChange={handleVolumeChange}
+                  className="appearance-none w-full bg-gray-50 border border-gray-300 rounded-lg py-3 px-4 pr-8 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                >
+                  {[...Array(8).keys()].map((v) => (
+                    <option key={v + 1} value={v + 1}>
+                      Volume {v + 1}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-5 h-5" />
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <input
+                  id="searchAllVolumes"
+                  type="checkbox"
+                  checked={searchAllVolumes}
+                  onChange={(e) => setSearchAllVolumes(e.target.checked)}
+                  className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label htmlFor="searchAllVolumes" className="text-sm text-gray-600">
+                  Search Across All Volumes
+                </label>
+              </div>
+            </div>
+
+            {/* Search Input */}
+            <div className="space-y-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Search Terms
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  onBlur={handleSearchBlur}
+                  className="w-full bg-gray-50 border border-gray-300 rounded-lg py-3 px-4 pl-10 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="Enter search terms..."
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              </div>
+
+              {/* Grading Filters */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
+                {[
+                  { id: "sahihOnly", label: "Sahih", state: sahihOnly, setState: setSahihOnly },
+                  { id: "goodOnly", label: "Good", state: goodOnly, setState: setGoodOnly },
+                  { id: "weakOnly", label: "Weak", state: weakOnly, setState: setWeakOnly },
+                  { id: "unknownOnly", label: "Unknown", state: unknownOnly, setState: setUnknownOnly },
+                ].map((filter) => (
+                  <div key={filter.id} className="flex items-center space-x-2">
+                    <input
+                      id={filter.id}
+                      type="checkbox"
+                      checked={filter.state}
+                      onChange={(e) => filter.setState(e.target.checked)}
+                      className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <label htmlFor={filter.id} className="text-sm text-gray-600">
+                      {filter.label}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Search Button */}
+          <div className="mt-6 flex justify-end">
+            <button
+              onClick={handleSearch}
+              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all"
+            >
+              <Search className="w-5 h-5 mr-2" />
+              Search
+            </button>
+          </div>
+        </div>
+
+        {/* Search Results */}
+        {searchPerformed && (
+          <div className="space-y-6 mb-12">
             {isLoading ? (
-              <p className="text-gray-700">Loading...</p>
+              <div className="bg-white rounded-xl shadow-md p-8 text-center">
+                <div className="animate-pulse text-gray-600">Loading results...</div>
+              </div>
             ) : searchResults.length === 0 ? (
-              <p className="text-gray-700">No search results</p>
+              <div className="bg-white rounded-xl shadow-md p-8 text-center">
+                <p className="text-gray-600">No results found for your search criteria</p>
+              </div>
             ) : (
               searchResults.map((result, idx) => (
-                <div key={idx} className="mb-4">
-                  <h3 className="text-lg font-medium text-gray-800">
-                    Volume {result.volume}, Page {result.index + 1}
-                  </h3>
-                  <pre className="bg-gray-200 p-2 rounded text-gray-800 text-lg whitespace-pre-wrap">
-                    {isArabic(searchTerm)
-                      ? result.content
-                      : highlightSearchTerm(result.content, searchTerm)}
-                  </pre>
-                  <a href={result.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
-                    Link
-                  </a>
-                  <p className="text-lg">
-                    Grading: {result.majlisiGrading}
-                  </p>
+                <div key={idx} className="bg-white rounded-xl shadow-md p-6 transition-all hover:shadow-lg">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <Book className="w-6 h-6 text-blue-600" />
+                    <h3 className="text-lg font-medium text-gray-900">
+                      Volume {result.volume}, Page {result.index + 1}
+                    </h3>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                    <pre className="text-gray-800 text-lg whitespace-pre-wrap">
+                      {isArabic(searchTerm)
+                        ? result.content
+                        : highlightSearchTerm(result.content, searchTerm)}
+                    </pre>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-4">
+                    <a
+                      href={result.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-lg inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+                    >
+                      View Source →
+                    </a>
+                    <span className="text-gray-600 text-lg">
+                      Grading: <span className="font-medium">{result.majlisiGrading}</span>
+                    </span>
+                  </div>
                 </div>
               ))
             )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
