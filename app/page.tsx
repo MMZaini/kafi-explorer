@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 export default function Home() {
   const [volume, setVolume] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   interface SearchResult {
     volume: number;
     index: number;
@@ -83,13 +84,16 @@ export default function Home() {
       return;
     }
 
+    setIsLoading(true);
     setSearchPerformed(true);
-    const searchResults: SearchResult[] = [];
+    setSearchResults([]);
+
+    const results: SearchResult[] = [];
     const volumesToSearch = searchAllVolumes ? [1, 2, 3, 4, 5, 6, 7, 8] : [volume];
     const searchInArabic = isArabic(searchTerm);
     const normalizedSearchTerm = searchInArabic ? removeHarakat(searchTerm.trim()) : searchTerm.trim().toLowerCase();
 
-    volumesToSearch.forEach((vol) => {
+    const fetchPromises = volumesToSearch.map((vol) =>
       fetch(`/jsons/kafi/kafi_v${vol}.json`)
         .then((response) => response.json())
         .then((volumeData: { englishText: string; arabicText?: string; majlisiGrading?: string; URL: string; }[]) => {
@@ -121,7 +125,7 @@ export default function Home() {
               const isContentMatch = normalizedContent.includes(normalizedSearchTerm);
 
               if (isContentMatch) {
-                searchResults.push({
+                results.push({
                   volume: vol,
                   index: idx,
                   content: item.englishText, // Always display English text
@@ -131,11 +135,13 @@ export default function Home() {
               }
             }
           });
-
-          console.log("Search Results:", searchResults);
-          setSearchResults(searchResults);
         })
-        .catch((error) => console.error("Error fetching data:", error));
+        .catch((error) => console.error("Error fetching data:", error))
+    );
+
+    Promise.all(fetchPromises).then(() => {
+      setSearchResults(results);
+      setIsLoading(false);
     });
   };
 
@@ -276,7 +282,9 @@ export default function Home() {
       {searchPerformed && (
         <div className="mb-12">
           <div className="border p-4 rounded mb-4 bg-white shadow max-w-7xl mx-auto">
-            {searchResults.length === 0 ? (
+            {isLoading ? (
+              <p className="text-gray-700">Loading...</p>
+            ) : searchResults.length === 0 ? (
               <p className="text-gray-700">No search results</p>
             ) : (
               searchResults.map((result, idx) => (
