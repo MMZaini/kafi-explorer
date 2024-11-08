@@ -23,6 +23,6 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 ## Credit
 - My brother Ali for 'putting me on' to react and github copilot
 
-- Mr Peace not catching me make this in class instead of revising
+- Mr Peace for not catching me make this in class instead of revising
   
 - [MohammedArab1](https://github.com/MohammedArab1) with his [ThaqalaynAPI](https://github.com/MohammedArab1/ThaqalaynAPI) for his public jsons of al-kafi volumes 1-8 with gradings and thaqalayn links which saved me time scraping text, links and gradings my self, instead i could just sanitise his data to suit my needs.
