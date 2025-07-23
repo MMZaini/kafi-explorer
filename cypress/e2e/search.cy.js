@@ -24,18 +24,17 @@ describe('Search Functionality', () => {
     it('should toggle the "Search Across All Volumes" checkbox', () => {
       // Check the checkbox
       cy.get('input#searchAllVolumes').check().should('be.checked');
-  
+
       // Uncheck the checkbox
       cy.get('input#searchAllVolumes').uncheck().should('not.be.checked');
     });
-  
-    it('should toggle the "Flexible Word Search" checkbox', () => {
-      // Check the checkbox
-      cy.get('input#flexibleSearch').check().should('be.checked');
-  
-      // Uncheck the checkbox
-      cy.get('input#flexibleSearch').uncheck().should('not.be.checked');
+
+    it('can toggle dark mode', () => {
+      cy.get('button').contains('Kafi Explorer').should('be.visible');
+      cy.get('button').last().click();
+      cy.get('html').should('have.class', 'dark');
     });
+  
   
     it('should filter results based on grading checkboxes', () => {
       // Check the "Sahih" checkbox

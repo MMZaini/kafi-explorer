@@ -1,20 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Book, ChevronDown } from "lucide-react";
+import { Search, Book, ChevronDown, Sun, Moon, ArrowUp } from "lucide-react";
 
 export default function Home() {
   const [volume, setVolume] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [flexibleSearch, setFlexibleSearch] = useState(false);
+  const [theme, setTheme] = useState("light");
 
   interface SearchResult {
     volume: number;
     index: number;
-    content: string;
-    url: string;
-    majlisiGrading: string | undefined;
+    englishText: string;
+    URL: string;
+    majlisiGrading?: string;
   }
 
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -24,17 +24,29 @@ export default function Home() {
   const [goodOnly, setGoodOnly] = useState(false);
   const [weakOnly, setWeakOnly] = useState(false);
   const [unknownOnly, setUnknownOnly] = useState(false);
+  const [showScroll, setShowScroll] = useState(false);
 
   useEffect(() => {
-    fetch(`/jsons/kafi/kafi_v${volume}.json`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .catch((error) => console.error("Fetch error:", error));
-  }, [volume]);
+    const stored = localStorage.getItem("theme");
+    if (stored === "dark") {
+      setTheme("dark");
+      document.documentElement.classList.add("dark");
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+    document.documentElement.classList.toggle("dark", newTheme === "dark");
+  };
+
+  useEffect(() => {
+    const handler = () => setShowScroll(window.scrollY > 200);
+    window.addEventListener("scroll", handler);
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
+
 
   const handleVolumeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setVolume(Number(event.target.value));
@@ -77,10 +89,8 @@ export default function Home() {
   // Utility function to detect Arabic characters
   const isArabic = (text: string) => /[\u0600-\u06FF]/.test(text);
 
-  // Utility function to remove harakat (diacritics)
-  const removeHarakat = (text: string) => text.replace(/[\u064B-\u0652]/g, "");
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (searchTerm.trim() === "") {
       setSearchResults([]);
       setSearchPerformed(false);
@@ -91,65 +101,34 @@ export default function Home() {
     setSearchPerformed(true);
     setSearchResults([]);
 
-    const results: SearchResult[] = [];
-    const volumesToSearch = searchAllVolumes ? [1, 2, 3, 4, 5, 6, 7, 8] : [volume];
-    const searchInArabic = isArabic(searchTerm);
-    const normalizedSearchTerm = searchInArabic ? removeHarakat(searchTerm.trim()) : searchTerm.trim().toLowerCase();
+    const params = new URLSearchParams();
+    params.append("q", searchTerm);
+    if (searchAllVolumes) {
+      params.append("all", "true");
+    } else {
+      params.append("volume", volume.toString());
+    }
+    if (sahihOnly) params.append("grade", "sahih");
+    if (goodOnly) params.append("grade", "good");
+    if (weakOnly) params.append("grade", "weak");
+    if (unknownOnly) params.append("grade", "unknown");
 
-    const fetchPromises = volumesToSearch.map((vol) =>
-      fetch(`/jsons/kafi/kafi_v${vol}.json`)
-        .then((response) => response.json())
-        .then((volumeData: { englishText: string; arabicText?: string; majlisiGrading?: string; URL: string; }[]) => {
-          volumeData.forEach((item, idx) => {
-            const contentToSearch = searchInArabic ? item.arabicText || "" : item.englishText;
-            const normalizedContent = searchInArabic ? removeHarakat(contentToSearch.trim()) : contentToSearch.trim().toLowerCase();
-            const majlisiGrading = item.majlisiGrading;
-            const url = item.URL;
-
-            // Grading checks
-            const isSahih = sahihOnly && majlisiGrading && validGradingsSet.has(majlisiGrading);
-            const isGood = goodOnly && majlisiGrading && goodGradingsSet.has(majlisiGrading);
-            const isWeak = weakOnly && majlisiGrading && weakGradingsSet.has(majlisiGrading);
-            const isUnknown =
-              unknownOnly &&
-              (majlisiGrading === "مرسل" || majlisiGrading === "مجهول");
-
-            const isGradingValid =
-              (sahihOnly && isSahih) ||
-              (goodOnly && isGood) ||
-              (weakOnly && isWeak) ||
-              (unknownOnly && isUnknown) ||
-              (!sahihOnly && !goodOnly && !weakOnly && !unknownOnly);
-
-            if (
-              (majlisiGrading || unknownOnly) &&
-              isGradingValid
-            ) {
-              const isContentMatch = flexibleSearch
-                ? normalizedSearchTerm
-                    .split(/\s+/)
-                    .every((word) => normalizedContent.includes(word))
-                : normalizedContent.includes(normalizedSearchTerm);
-
-              if (isContentMatch) {
-                results.push({
-                  volume: vol,
-                  index: idx,
-                  content: item.englishText, // Always display English text
-                  url,
-                  majlisiGrading: item.majlisiGrading,
-                });
-              }
-            }
-          });
-        })
-        .catch((error) => console.error("Error fetching data:", error))
-    );
-
-    Promise.all(fetchPromises).then(() => {
-      setSearchResults(results);
-      setIsLoading(false);
-    });
+    try {
+      const res = await fetch(`/api/search?${params.toString()}`);
+      const data = await res.json();
+      setSearchResults(
+        data.results.map((r: SearchResult) => ({
+          volume: r.volume,
+          index: r.index,
+          englishText: r.englishText,
+          URL: r.URL,
+          majlisiGrading: r.majlisiGrading,
+        }))
+      );
+    } catch (err) {
+      console.error("Search error", err);
+    }
+    setIsLoading(false);
   };
 
   const handleSearchBlur = () => {
@@ -162,19 +141,6 @@ export default function Home() {
   const highlightSearchTerm = (text: string, term: string) => {
     if (!term || isArabic(term)) return text;
 
-    if (flexibleSearch) {
-      const words = term.trim().split(/\s+/);
-      const regex = new RegExp(`(${words.join('|')})`, 'gi');
-      return text.split(regex).map((part, index) =>
-        words.some(word => part.toLowerCase() === word.toLowerCase()) ? (
-          <span key={index} className="bg-yellow-200 font-bold">
-            {part}
-          </span>
-        ) : (
-          part
-        )
-      );
-    }
 
     const regex = new RegExp(`(${term})`, 'gi');
     return text.split(regex).map((part, index) =>
@@ -188,20 +154,31 @@ export default function Home() {
     );
   };
 
+  const getGradeClass = (grade?: string) => {
+    if (!grade) return "bg-gray-200 text-gray-800";
+    if (validGradingsSet.has(grade)) return "bg-green-200 text-green-800";
+    if (goodGradingsSet.has(grade)) return "bg-amber-200 text-amber-800";
+    if (weakGradingsSet.has(grade)) return "bg-red-200 text-red-800";
+    return "bg-gray-200 text-gray-800";
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
       {/* Header Section */}
-      <div className="bg-white shadow-lg">
-        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold text-center text-gray-900 -mb-2 -mt-2">
+      <div className="bg-white dark:bg-gray-800 shadow-lg">
+        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100">
             Kafi Explorer
           </h1>
+          <button onClick={toggleTheme} className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+            {theme === "light" ? <Moon className="w-6 h-6" /> : <Sun className="w-6 h-6" />}
+          </button>
         </div>
       </div>
 
       {/* Search Controls */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-14">
-        <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Volume Selection */}
             <div className="space-y-4">
@@ -212,7 +189,8 @@ export default function Home() {
                 <select
                   value={volume}
                   onChange={handleVolumeChange}
-                  className="appearance-none w-full bg-gray-50 border border-gray-300 rounded-lg py-3 px-4 pr-8 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  disabled={searchAllVolumes}
+                  className="appearance-none w-full bg-gray-50 border border-gray-300 rounded-lg py-3 px-4 pr-8 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:opacity-50"
                 >
                   {[...Array(8).keys()].map((v) => (
                     <option key={v + 1} value={v + 1}>
@@ -237,18 +215,6 @@ export default function Home() {
                   </label>
                 </div>
 
-                <div className="flex items-center space-x-2">
-                  <input
-                    id="flexibleSearch"
-                    type="checkbox"
-                    checked={flexibleSearch}
-                    onChange={(e) => setFlexibleSearch(e.target.checked)}
-                    className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
-                  />
-                  <label htmlFor="flexibleSearch" className="text-sm text-gray-600">
-                    Flexible Word Search
-                  </label>
-                </div>
               </div>
             </div>
 
@@ -311,16 +277,20 @@ export default function Home() {
         {searchPerformed && (
           <div className="space-y-6 mb-12">
             {isLoading ? (
-              <div className="bg-white rounded-xl shadow-md p-8 text-center">
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 text-center">
                 <div className="animate-pulse text-gray-600">Loading results...</div>
               </div>
             ) : searchResults.length === 0 ? (
-              <div className="bg-white rounded-xl shadow-md p-8 text-center">
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 text-center">
                 <p className="text-gray-600">No results found for your search criteria</p>
               </div>
             ) : (
-              searchResults.map((result, idx) => (
-                <div key={idx} className="bg-white rounded-xl shadow-md p-6 transition-all hover:shadow-lg">
+              <>
+                <p className="text-gray-600 mb-4">
+                  Showing {searchResults.length} results
+                </p>
+                {searchResults.map((result, idx) => (
+                  <div key={idx} className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 transition-all hover:shadow-lg">
                   <div className="flex items-center space-x-4 mb-4">
                     <Book className="w-6 h-6 text-blue-600" />
                     <h3 className="text-lg font-medium text-gray-900">
@@ -331,30 +301,39 @@ export default function Home() {
                   <div className="bg-gray-50 rounded-lg p-4 mb-4">
                     <pre className="text-gray-800 md:text-lg text-base whitespace-pre-wrap ">
                       {isArabic(searchTerm)
-                        ? result.content
-                        : highlightSearchTerm(result.content, searchTerm)}
+                        ? result.englishText
+                        : highlightSearchTerm(result.englishText, searchTerm)}
                     </pre>
                   </div>
 
                   <div className="flex flex-wrap items-center gap-4">
                     <a
-                      href={result.url}
+                      href={result.URL}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-lg inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
                     >
                       View Source →
                     </a>
-                    <span className="text-gray-600 text-lg">
-                      Grading: <span className="font-medium">{result.majlisiGrading}</span>
+                    <span className={`text-sm px-2 py-1 rounded ${getGradeClass(result.majlisiGrading)}`}>
+                      {result.majlisiGrading || "Unknown"}
                     </span>
                   </div>
                 </div>
-              ))
+                ))}
+              </>
             )}
           </div>
         )}
       </div>
+      {showScroll && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="fixed bottom-6 right-6 p-3 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700"
+        >
+          <ArrowUp className="w-5 h-5" />
+        </button>
+      )}
     </div>
   );
 }
