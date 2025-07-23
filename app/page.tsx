@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Book, ChevronDown } from "lucide-react";
+import { Search, Book, ChevronDown, Filter } from "lucide-react";
 
 export default function Home() {
   const [volume, setVolume] = useState(1);
@@ -189,11 +189,11 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-sky-50 via-emerald-50 to-emerald-100">
       {/* Header Section */}
-      <div className="bg-white shadow-lg">
-        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold text-center text-gray-900 -mb-2 -mt-2">
+      <div className="bg-white/80 backdrop-blur-md shadow-xl">
+        <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+          <h1 className="text-5xl font-extrabold text-center bg-gradient-to-r from-sky-600 via-emerald-600 to-green-500 bg-clip-text text-transparent drop-shadow-md">
             Kafi Explorer
           </h1>
         </div>
@@ -201,7 +201,7 @@ export default function Home() {
 
       {/* Search Controls */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-14">
-        <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Volume Selection */}
             <div className="space-y-4">
@@ -212,7 +212,7 @@ export default function Home() {
                 <select
                   value={volume}
                   onChange={handleVolumeChange}
-                  className="appearance-none w-full bg-gray-50 border border-gray-300 rounded-lg py-3 px-4 pr-8 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="appearance-none w-full bg-gray-50 border border-gray-300 rounded-lg py-3 px-4 pr-8 text-gray-800 focus:outline-none focus:ring-4 focus:ring-sky-200 focus:border-transparent shadow-sm hover:shadow-md"
                 >
                   {[...Array(8).keys()].map((v) => (
                     <option key={v + 1} value={v + 1}>
@@ -230,7 +230,7 @@ export default function Home() {
                     type="checkbox"
                     checked={searchAllVolumes}
                     onChange={(e) => setSearchAllVolumes(e.target.checked)}
-                    className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
+                    className="w-4 h-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500 accent-sky-600"
                   />
                   <label htmlFor="searchAllVolumes" className="text-sm text-gray-600">
                     Search Across All Volumes
@@ -243,7 +243,7 @@ export default function Home() {
                     type="checkbox"
                     checked={flexibleSearch}
                     onChange={(e) => setFlexibleSearch(e.target.checked)}
-                    className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
+                    className="w-4 h-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500 accent-sky-600"
                   />
                   <label htmlFor="flexibleSearch" className="text-sm text-gray-600">
                     Flexible Word Search
@@ -264,7 +264,7 @@ export default function Home() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   onBlur={handleSearchBlur}
-                  className="w-full bg-gray-50 border border-gray-300 rounded-lg py-3 px-4 pl-10 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="w-full bg-gray-50 border border-gray-300 rounded-lg py-3 px-4 pl-10 text-gray-800 focus:outline-none focus:ring-4 focus:ring-sky-200 focus:border-transparent shadow-sm hover:shadow-md"
                   placeholder="Enter search terms..."
                 />
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -272,6 +272,9 @@ export default function Home() {
 
               {/* Grading Filters */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
+                <div className="col-span-full flex items-center text-sm font-medium text-gray-700 mb-1">
+                  <Filter className="w-4 h-4 mr-1" /> Grading Filters
+                </div>
                 {[
                   { id: "sahihOnly", label: "Sahih", state: sahihOnly, setState: setSahihOnly },
                   { id: "goodOnly", label: "Good", state: goodOnly, setState: setGoodOnly },
@@ -284,7 +287,7 @@ export default function Home() {
                       type="checkbox"
                       checked={filter.state}
                       onChange={(e) => filter.setState(e.target.checked)}
-                      className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
+                      className="w-4 h-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500 accent-sky-600"
                     />
                     <label htmlFor={filter.id} className="text-sm text-gray-600">
                       {filter.label}
@@ -299,7 +302,7 @@ export default function Home() {
           <div className="mt-6 flex justify-end">
             <button
               onClick={handleSearch}
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all"
+              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-xl shadow-md text-white bg-gradient-to-r from-sky-500 to-emerald-500 hover:from-sky-600 hover:to-emerald-600 focus:outline-none focus:ring-4 focus:ring-sky-300 transition-all hover:-translate-y-0.5"
             >
               <Search className="w-5 h-5 mr-2" />
               Search
@@ -311,24 +314,24 @@ export default function Home() {
         {searchPerformed && (
           <div className="space-y-6 mb-12">
             {isLoading ? (
-              <div className="bg-white rounded-xl shadow-md p-8 text-center">
+              <div className="bg-white/80 rounded-2xl shadow-md p-8 text-center backdrop-blur-sm">
                 <div className="animate-pulse text-gray-600">Loading results...</div>
               </div>
             ) : searchResults.length === 0 ? (
-              <div className="bg-white rounded-xl shadow-md p-8 text-center">
+              <div className="bg-white/80 rounded-2xl shadow-md p-8 text-center backdrop-blur-sm">
                 <p className="text-gray-600">No results found for your search criteria</p>
               </div>
             ) : (
               searchResults.map((result, idx) => (
-                <div key={idx} className="bg-white rounded-xl shadow-md p-6 transition-all hover:shadow-lg">
+                <div key={idx} className="bg-white/80 rounded-2xl shadow-md p-6 transition-all hover:shadow-xl backdrop-blur-sm">
                   <div className="flex items-center space-x-4 mb-4">
-                    <Book className="w-6 h-6 text-blue-600" />
+                    <Book className="w-6 h-6 text-sky-600" />
                     <h3 className="text-lg font-medium text-gray-900">
                       Volume {result.volume}, Page {result.index + 1}
                     </h3>
                   </div>
 
-                  <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                  <div className="bg-gray-50/80 rounded-lg p-4 mb-4 backdrop-blur-sm">
                     <pre className="text-gray-800 md:text-lg text-base whitespace-pre-wrap ">
                       {isArabic(searchTerm)
                         ? result.content
@@ -341,7 +344,7 @@ export default function Home() {
                       href={result.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-lg inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+                      className="text-lg font-semibold inline-flex items-center text-sky-600 hover:text-sky-800 transition-colors"
                     >
                       View Source →
                     </a>
