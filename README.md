@@ -23,6 +23,16 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## API
+
+Search requests can be made to `/api/search`:
+
+```
+GET /api/search?q=prayer&volume=1
+```
+
+Returns JSON array of matching hadith objects.
+
 ## Credit
 
 - My brother Ali for 'putting me on' to react and github copilot
