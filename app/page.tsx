@@ -208,16 +208,16 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-50 via-emerald-50 to-emerald-100">
+    <div className="min-h-screen nice-background">
       {/* Header Section */}
-      <div className="bg-white/80 backdrop-blur-md shadow-xl">
+      <div className="bg-white/80 backdrop-blur-md shadow-xl select-none">
         <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
           <h1
-            className="text-5xl font-extrabold text-center bg-clip-text text-transparent drop-shadow-md"
+            className="text-5xl font-extrabold text-center bg-clip-text text-transparent drop-shadow-md gradient-smooth"
             style={{
               backgroundImage:
                 "linear-gradient(to right, rgb(2 132 199), rgb(5 150 105), rgb(16 185 129))",
-              backgroundSize: "200% 200%",
+              backgroundSize: "300% 300%",
               backgroundPosition: `${headingGradientPos.x}% ${headingGradientPos.y}%`,
             }}
             onMouseMove={(e) => handleGradientMove(e, setHeadingGradientPos)}
@@ -229,7 +229,7 @@ export default function Home() {
       </div>
 
       {/* Search Controls */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-14">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-14 select-none">
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Volume Selection */}
@@ -331,10 +331,10 @@ export default function Home() {
           <div className="mt-6 flex justify-end">
             <button
               onClick={handleSearch}
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-xl shadow-md text-white transition-all hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-sky-300"
+              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-xl shadow-md text-white transition-all hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-sky-300 gradient-smooth"
               style={{
                 backgroundImage: "linear-gradient(to right, rgb(14 165 233), rgb(52 211 153))",
-                backgroundSize: "200% 200%",
+                backgroundSize: "300% 300%",
                 backgroundPosition: `${buttonGradientPos.x}% ${buttonGradientPos.y}%`,
               }}
               onMouseMove={(e) => handleGradientMove(e, setButtonGradientPos)}
