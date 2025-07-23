@@ -16,6 +16,11 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "al-Kafi Explorer",
   description: "al-Kafi Explorer by Mahdi Z",
+  openGraph: {
+    title: 'al-Kafi Explorer',
+    description: 'Search through the al-Kafi hadith collection',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({
