@@ -126,11 +126,9 @@ export default function Home() {
               isGradingValid
             ) {
               const isContentMatch = flexibleSearch
-                ? searchTerm
-                  .trim()
-                  .toLowerCase()
-                  .split(/\s+/)
-                  .every(word => normalizedContent.includes(word))
+                ? normalizedSearchTerm
+                    .split(/\s+/)
+                    .every((word) => normalizedContent.includes(word))
                 : normalizedContent.includes(normalizedSearchTerm);
 
               if (isContentMatch) {
