@@ -12,8 +12,8 @@ This project provides a clean UI, advanced filters, and a searchable interface f
 ## 🚀 Features
 - 🔎 **Search Engine** for al-Kafi texts (Arabic + English)
 - 🗂️ **Advanced Filters** for efficient research and content exploration
-- 🐍 **ETL Pipeline (Python)** for sanitizing and transforming source data
-- ⚡ **Modern UI/UX** built with Next.js, React, and TypeScript
+> 🐍 **ETL Pipeline (Python)** for sanitizing and transforming source data
+- ⚡ **Decent UI/UX** built with Next.js, React, and TypeScript
 
 ---
 
