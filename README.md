@@ -3,7 +3,8 @@
 A **Next.js-powered exploration tool** for navigating **Arabic texts with English translations**.  
 This project provides a clean UI, advanced filters, and a searchable interface for **al-Kafi**, one of the major Shi‘i hadith collections.
 
-> ⚠️ Note: This public repo contains the **web app and ETL pipeline**.  
+> ⚠️ Note: This public repo contains the **web app and ETL pipeline**.
+> 
 > An extended version with **AI-assisted semantic search (RAG + LLM integration)** was developed privately and is **not included here**.
 
 ---
