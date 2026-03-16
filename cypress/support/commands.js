@@ -1,3 +1,3 @@
-Cypress.Commands.add('helloWorld', () => {
-    cy.log('Hello, World!');
+Cypress.Commands.add("helloWorld", () => {
+  cy.log("Hello, World!");
 });
